@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Midi-chlorian Chart</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/3.9.0/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/3.9.0/firebase-auth.js"></script>
+    <script defer src="/__/firebase/3.9.0/firebase-database.js"></script>
+    <script defer src="/__/firebase/3.9.0/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/3.9.0/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <p id="load">Firebase SDK Loading&hellip;</p>
+    <form>
+    Alias:<br/>
+    <input type="text" id="alias"><br/>
+    Description:<br/>
+    <input type="text" id="description"><br/>
+    Criteria:<br/>
+    <input type="text" id="criteria"><br/>
+    Value:<br/>
+    <input type="text" id="value"><br/>
+    <button type="button" id="addtask">Add Task!</button>
+    </form>
+<br/>
+    <table id="taskTable">
+      <thead><tr><td>alias</td><td>description</td><td>criteria</td><td>value</td></tr></thead>
+      <tbody></tbody>
+    </table>
+    <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyB2ZOF5JZW3clFnFyqJbZV7kf_AjsGVsWQ",
+        authDomain: "midi-chlorian-meter.firebaseapp.com",
+        databaseURL: "https://midi-chlorian-meter.firebaseio.com",
+        projectId: "midi-chlorian-meter",
+        storageBucket: "midi-chlorian-meter.appspot.com",
+        messagingSenderId: "434811748069"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        var tasks = []
+
+        firebase.auth().onAuthStateChanged(user => { });
+        var eventsRef = firebase.database().ref('/tasks');
+        eventsRef.on('child_added', function(data) {
+
+          var taskVal = data.val()
+          displayTask(taskVal)
+          console.log(taskVal)
+        });
+
+        function displayTask(task) {
+          var tbdy = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
+          var index = 0
+          for (var i = 0; i < tbdy.rows.length; i++) {
+              if (parseInt(tbdy.rows[i].cells[3].innerHTML)<parseInt(task.value)) {
+                index = i+1
+              }
+          }
+          var row = tbdy.insertRow(index)
+          var cell1 = row.insertCell(0)
+          var newText  = document.createTextNode(task.alias)
+          cell1.appendChild(newText);
+          var cell2 = row.insertCell(1)
+          newText = document.createTextNode(task.description)
+          cell2.appendChild(newText);
+          var cell3 = row.insertCell(2)
+          newText = document.createTextNode(task.criteria)
+          cell3.appendChild(newText);
+          var cell4 = row.insertCell(3)
+          newText = document.createTextNode(task.value)
+          cell4.appendChild(newText);
+        }
+
+        eventsRef.on('child_removed', function(data) {
+          var tbdy = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
+          var index = 0
+          for (var i = 0; i < tbdy.rows.length; i++) {
+              if (tbdy.rows[i].cells[0].innerHTML==data.val().alias) {
+                tbdy.deleteRow(i)
+                i--
+              }
+           }
+        });
+
+        addTask = document.getElementById('addtask')
+        addTask.onclick = function() {
+            alias = document.getElementById("alias").value
+            description = document.getElementById("description").value
+            criteria = document.getElementById("criteria").value
+            value = parseInt(document.getElementById("value").value)
+          console.log(alias + description + criteria + value)
+          firebase.database().ref('tasks/').push({
+            alias:alias,
+            description:description,
+            criteria:criteria,
+            value:value
+          })
+        }
+                //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+        try {
+          let app = firebase.app();
+          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
+          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
+</html>
