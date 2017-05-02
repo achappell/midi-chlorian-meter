@@ -15,12 +15,13 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="https://midi-chlorian-meter.firebaseapp.com/css/shared.css" />
+
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
       #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
@@ -37,11 +38,18 @@
     </style>
   </head>
   <body>
+    <div class="topnav" id="myTopnav">
+      <a href="https://midi-chlorian-meter.firebaseapp.com/index.html">Leaderboard</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/tasks.html">Tasks</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/events.html">Events</a>
+    </div>
     <p id="load">Firebase SDK Loading&hellip;</p>
     <div class="container">
-    <h1>Leaderboard</h1>
-    <h2><table class="table table-striped"><tbody id="userTable"></tbody></table></h2>
-  </div>
+      <h1>Events</h1>
+      <table class="table table-striped">
+        <thead><tr><td>date</td><td>alias</td><td>value</td><td>description</td></tr></thead>
+        <tbody id="eventsTable"></tbody></table>
+    </div>
     <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
     <script>
       // Initialize Firebase
@@ -60,14 +68,13 @@
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
         //
-        var users = []
+        var events = []
 
         firebase.auth().onAuthStateChanged(user => { });
         var eventsRef = firebase.database().ref('/events');
         eventsRef.on('child_added', function(data) {
 
           var eventVal = data.val()
-          var userFound
 
           var date = new Date();
           var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -76,43 +83,38 @@
           var eventDate = new Date(eventVal.date)
 
           if (eventDate.getTime() >= firstDay.getTime() && eventDate.getTime() <= lastDay.getTime()) {
-
-            for (var i = 0; i < users.length; i++) {
-              if (users[i].name == eventVal.user) {
-                userFound = users[i]
-              }
-            }
-
-            if (userFound === undefined) {
-              userFound = {"name": eventVal.user, "totalPoints": 0}
-              users.push(userFound)
-            }
-
-            userFound.totalPoints = userFound.totalPoints + eventVal.value
+            events.push(eventVal)
           }
 
-          users.sort(function(a, b) {
-            return b.totalPoints - a.totalPoints
-          });
+          console.log(eventVal)
 
-          renderTable(users)
+          renderTable(events)
         });
 
-        function renderTable(users) {
-          var tbdy = document.getElementById('userTable');
+        function renderTable(events) {
+          var tbdy = document.getElementById('eventsTable');
           while (tbdy.firstChild) {
               tbdy.removeChild(tbdy.firstChild);
           }
 
-          for (var i = 0; i < users.length; i++) {
+          for (var i = 0; i < events.length; i++) {
               var tr = document.createElement('tr');
               var td = document.createElement('td');
-              td.appendChild(document.createTextNode(users[i].name))
+              td.appendChild(document.createTextNode(events[i].date))
               tr.appendChild(td)
 
               td = document.createElement('td');
-              td.appendChild(document.createTextNode(users[i].totalPoints))
+              td.appendChild(document.createTextNode(events[i].user))
               tr.appendChild(td)
+
+              td = document.createElement('td');
+              td.appendChild(document.createTextNode(events[i].value))
+              tr.appendChild(td)
+
+              td = document.createElement('td');
+              td.appendChild(document.createTextNode(events[i].description))
+              tr.appendChild(td)
+
               tbdy.appendChild(tr);
           }
         }
