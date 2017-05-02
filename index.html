@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>Midi-chlorian Meter</title>
 
     <!-- update the version number as needed -->
     <script defer src="/__/firebase/3.9.0/firebase-app.js"></script>
@@ -32,7 +32,10 @@
   </head>
   <body>
     <p id="load">Firebase SDK Loading&hellip;</p>
-    <table id="userTable"></table>
+    <h1>Leaderboard</h1>
+    <h2><table id="userTable"></table></h2>
+    <p><p>
+    <a href="https://midi-chlorian-meter.firebaseapp.com/tasks.html">List of Tasks</a>
     <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
     <script>
       // Initialize Firebase
@@ -60,25 +63,33 @@
           var eventVal = data.val()
           var userFound
 
-          for (var i = 0; i < users.length; i++) {
-            if (users[i].name == eventVal.user) {
-              userFound = users[i]
+          var date = new Date();
+          var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+          var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+          var eventDate = new Date(eventVal.date)
+
+          if (eventDate.getTime() >= firstDay.getTime() && eventDate.getTime() <= lastDay.getTime()) {
+
+            for (var i = 0; i < users.length; i++) {
+              if (users[i].name == eventVal.user) {
+                userFound = users[i]
+              }
             }
-          }
 
-          if (userFound === undefined) {
-            userFound = {"name": eventVal.user, "totalPoints": 0}
-            users.push(userFound)
-          }
+            if (userFound === undefined) {
+              userFound = {"name": eventVal.user, "totalPoints": 0}
+              users.push(userFound)
+            }
 
-          userFound.totalPoints = userFound.totalPoints + eventVal.value
+            userFound.totalPoints = userFound.totalPoints + eventVal.value
+          }
 
           users.sort(function(a, b) {
             return b.totalPoints - a.totalPoints
           });
 
           renderTable(users)
-          console.log(users)
         });
 
         function renderTable(users) {
