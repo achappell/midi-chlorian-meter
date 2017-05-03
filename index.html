@@ -92,6 +92,9 @@
           }
 
           users.sort(function(a, b) {
+            if (a.totalPoints == b.totalPoints) {
+              return a.name > b.name
+            }
             return b.totalPoints - a.totalPoints
           });
 
