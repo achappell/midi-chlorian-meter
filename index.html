@@ -15,12 +15,14 @@
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="https://midi-chlorian-meter.firebaseapp.com/css/shared.css" />
+
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
+    <script src="sorttable.js"></script>
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
       #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
@@ -37,10 +39,19 @@
     </style>
   </head>
   <body>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <div class="topnav" id="myTopnav">
+      <a href="https://midi-chlorian-meter.firebaseapp.com/index.html">Leaderboard</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/tasks.html">Tasks</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/events.html">Events</a>
+    </div>
     <div class="container">
     <h1>Leaderboard</h1>
-    <h2><table class="table table-striped"><tbody id="userTable"></tbody></table></h2>
+    <h2><table class="table table-striped sortable"><thead><tr>
+     <th>Name</th>
+     <th class="sorttable_numeric">Points</th>
+     <th class="sorttable_numeric">Padawan Points</th>
+     <th class="sorttable_numeric">Total Points</th>
+  </tr></thead><tbody id="userTable"></tbody></table></h2>
   </div>
     <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
     <script>
@@ -63,6 +74,29 @@
         var users = []
 
         firebase.auth().onAuthStateChanged(user => { });
+
+        var usersRef = firebase.database().ref('/users');
+        usersRef.on('child_added', function(data) {
+          var userVal = data.val()
+          var userFound
+
+          console.log(userVal)
+
+          for (var i = 0; i < users.length; i++) {
+            if (users[i].name == data.key) {
+              userFound = users[i]
+            }
+          }
+
+          if (userFound === undefined) {
+            console.log(userVal)
+            userFound = {"name": data.key, "totalPoints": 0, "jedi": userVal.jedi, "padawanPoints": 0}
+            users.push(userFound)
+          }
+
+          userFound.jedi = userVal.jedi
+        });
+
         var eventsRef = firebase.database().ref('/events');
         eventsRef.on('child_added', function(data) {
 
@@ -84,7 +118,8 @@
             }
 
             if (userFound === undefined) {
-              userFound = {"name": eventVal.user, "totalPoints": 0}
+              console.log("user not found for event: "+eventVal)
+              userFound = {"name": eventVal.user, "totalPoints": 0, "padawanPoints": 0}
               users.push(userFound)
             }
 
@@ -97,6 +132,17 @@
             }
             return b.totalPoints - a.totalPoints
           });
+
+          for (var i = 0; i < users.length; i++) {
+            var jediName = users[i].jedi
+            for (var j = 0; j < users.length; j++) {
+              if (users[j].name == jediName) {
+                users[j].padawanPoints = users[i].totalPoints/2.0
+              }
+            }
+          }
+
+          console.log(users)
 
           renderTable(users)
         });
@@ -116,6 +162,15 @@
               td = document.createElement('td');
               td.appendChild(document.createTextNode(users[i].totalPoints))
               tr.appendChild(td)
+
+              td = document.createElement('td');
+              td.appendChild(document.createTextNode(users[i].padawanPoints))
+              tr.appendChild(td)
+
+              td = document.createElement('td');
+              td.appendChild(document.createTextNode(users[i].padawanPoints+users[i].totalPoints))
+              tr.appendChild(td)
+
               tbdy.appendChild(tr);
           }
         }
@@ -123,17 +178,7 @@
         eventsRef.on('child_removed', function(data) {
           // deleteComment(postElement, data.key);
         });
-                //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        }
       });
     </script>
   </body>
