@@ -46,6 +46,14 @@
     </div>
     <div class="container">
     <h1>Leaderboard</h1>
+
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+        <span id="selectedMonth" class="selectedMonth">Month </span>
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" id="dropdown-menu">
+        </ul>
+    </div>
     <h2><table class="table table-striped sortable"><thead><tr>
      <th>Name</th>
      <th class="sorttable_numeric">Points</th>
@@ -72,6 +80,10 @@
         // // The Firebase SDK is initialized and available here!
         //
         var users = []
+        var allEvents = []
+        var monthNames = ["January", "February", "March", "April", "May", "June",
+                          "July", "August", "September", "October", "November", "December"];
+        var selectedMonth = new Date();
 
         firebase.auth().onAuthStateChanged(user => { });
 
@@ -103,9 +115,10 @@
           var eventVal = data.val()
           var userFound
 
-          var date = new Date();
-          var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-          var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+          allEvents.push(eventVal)
+
+          var firstDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
+          var lastDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
 
           var eventDate = new Date(eventVal.date)
 
@@ -126,13 +139,15 @@
             userFound.totalPoints = userFound.totalPoints + eventVal.value
           }
 
-          users.sort(function(a, b) {
-            if (a.totalPoints == b.totalPoints) {
-              return a.name > b.name
-            }
-            return b.totalPoints - a.totalPoints
-          });
 
+          calculatePadawanPoints()
+
+          sortUsers()
+
+          renderTable(users)
+        });
+
+        function calculatePadawanPoints() {
           for (var i = 0; i < users.length; i++) {
             var jediName = users[i].jedi
             for (var j = 0; j < users.length; j++) {
@@ -141,11 +156,72 @@
               }
             }
           }
+        }
 
-          console.log(users)
+        function sortUsers() {
+          users.sort(function(a, b) {
+            if ((a.totalPoints + a.padawanPoints) == (b.totalPoints + b.padawanPoints)) {
+              return a.name > b.name
+            }
+            return (b.totalPoints + b.padawanPoints) - (a.totalPoints + a.padawanPoints)
+          });
+        }
+
+        document.getElementById("selectedMonth").innerHTML = monthNames[selectedMonth.getMonth()];
+
+        renderMonthDropDown();
+
+        $(".dropdown-menu li").click(function(){
+          var selText = $(this).text();
+          $(this).parents('.dropdown').find('.selectedMonth').html(selText+' ');
+          var index = monthNames.indexOf(selText)
+          selectedMonth = new Date(selectedMonth.getFullYear(), index, 1);
+
+          var firstDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
+          var lastDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
+
+          for (var userIndex = 0; userIndex < users.length; userIndex++) {
+            var user = users[userIndex]
+            user.totalPoints = 0
+          }
+
+          for (var eventIndex = 0; eventIndex < allEvents.length; eventIndex++) {
+            var eventVal = allEvents[eventIndex]
+            var eventDate = new Date(eventVal.date)
+          if (eventDate.getTime() >= firstDay.getTime() && eventDate.getTime() <= lastDay.getTime()) {
+
+            for (var i = 0; i < users.length; i++) {
+              if (users[i].name == eventVal.user) {
+                userFound = users[i]
+              }
+            }
+
+            if (userFound === undefined) {
+              console.log("user not found for event: "+eventVal)
+              userFound = {"name": eventVal.user, "totalPoints": 0, "padawanPoints": 0}
+              users.push(userFound)
+            }
+
+            userFound.totalPoints = userFound.totalPoints + eventVal.value
+          }
+        }
+
+          calculatePadawanPoints()
+
+          sortUsers()
 
           renderTable(users)
+
         });
+
+        function renderMonthDropDown() {
+          var dropdown = document.getElementById('dropdown-menu');
+          for (var i = 0; i < monthNames.length; i++) {
+            var li = document.createElement('li');
+            li.innerHTML = monthNames[i]
+            dropdown.appendChild(li)
+          }
+        }
 
         function renderTable(users) {
           var tbdy = document.getElementById('userTable');
