@@ -177,8 +177,8 @@
           var index = monthNames.indexOf(selText)
           selectedMonth = new Date(selectedMonth.getFullYear(), index, 1);
 
-          var firstDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
-          var lastDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
+          var firstDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1));
+          var lastDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0));
 
           for (var userIndex = 0; userIndex < users.length; userIndex++) {
             var user = users[userIndex]
