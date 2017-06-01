@@ -117,8 +117,8 @@
 
           allEvents.push(eventVal)
 
-          var firstDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
-          var lastDay = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
+          var firstDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1));
+          var lastDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0));
 
           var eventDate = new Date(eventVal.date)
 
