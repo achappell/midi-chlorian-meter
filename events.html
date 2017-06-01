@@ -77,10 +77,8 @@
           var eventVal = data.val()
 
           var date = new Date();
-          var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-          console.log(firstDay);
-          var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-          console.log(lastDay);
+          var firstDay = new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
+          var lastDay = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0));
 
           var eventDate = new Date(eventVal.date)
 
