@@ -112,7 +112,11 @@
               tr.appendChild(td)
 
               td = document.createElement('td');
-              td.appendChild(document.createTextNode(events[i].description))
+              desc = events[i].description;
+              if(events[i].note) {
+                desc = desc+" ("+events[i].note+")";
+              }
+              td.appendChild(document.createTextNode(desc))
               tr.appendChild(td)
 
               tbdy.appendChild(tr);
