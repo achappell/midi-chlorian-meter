@@ -135,18 +135,19 @@
               userFound = {"name": eventVal.user, "totalPoints": 0, "padawanPoints": 0}
               users.push(userFound)
             }
-
-            userFound.totalPoints = userFound.totalPoints + eventVal.value
+            if (eventVal.padawan) {
+              userFound.padawanPoints = userFound.padawanPoints + eventVal.value
+            } else {
+              userFound.totalPoints = userFound.totalPoints + eventVal.value
+            }
           }
-
-
-          calculatePadawanPoints()
 
           sortUsers()
 
           renderTable(users)
         });
 
+        // Deprecated - the firebase database has events corresponding the padawan points
         function calculatePadawanPoints() {
           for (var i = 0; i < users.length; i++) {
             var jediName = users[i].jedi
@@ -202,11 +203,13 @@
               users.push(userFound)
             }
 
-            userFound.totalPoints = userFound.totalPoints + eventVal.value
+            if (eventVal.padawan) {
+              userFound.padawanPoints = userFound.padawanPoints + eventVal.value
+            } else {
+              userFound.totalPoints = userFound.totalPoints + eventVal.value
+            }
           }
         }
-
-          calculatePadawanPoints()
 
           sortUsers()
 
