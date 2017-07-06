@@ -47,7 +47,7 @@
     <div class="container">
       <h1>Events</h1>
       <table class="table table-striped">
-        <thead><tr><td>date</td><td>alias</td><td>value</td><td>description</td></tr></thead>
+        <thead><tr><td>date</td><td>alias</td><td>value</td><td>description</td><td>from padawan</td></tr></thead>
         <tbody id="eventsTable"></tbody></table>
     </div>
     <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
@@ -118,6 +118,13 @@
               }
               td.appendChild(document.createTextNode(desc))
               tr.appendChild(td)
+
+              td = document.createElement('td');
+              if (events[i].padawan) {
+                td.appendChild(document.createTextNode(events[i].padawan))
+              }
+              tr.appendChild(td)
+
 
               tbdy.appendChild(tr);
           }
