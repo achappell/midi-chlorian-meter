@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Midi-chlorian Meter</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/3.9.0/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/3.9.0/firebase-auth.js"></script>
+    <script defer src="/__/firebase/3.9.0/firebase-database.js"></script>
+    <script defer src="/__/firebase/3.9.0/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/3.9.0/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://midi-chlorian-meter.firebaseapp.com/css/shared.css" />
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="sorttable.js"></script>
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topnav" id="myTopnav">
+      <a href="https://midi-chlorian-meter.firebaseapp.com/index.html">Leaderboard</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/tasks.html">Tasks</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/events.html">Events</a>
+      <a href="https://midi-chlorian-meter.firebaseapp.com/commands.html">Commands</a>
+    </div>
+    <div class="container">
+      <h1>Hipchat Commands</h1>
+      <h1 style="font-family:courier;">@MidiBot &lt@user1 [@user2 ...]&gt
+          <p style="text-indent: 5.5em"><span style="color: #0C6D66">did <span style="color: #00423E">&lttask&gt</span></span></p>
+          <p style="text-indent: 5.5em"><span style="color: #B15814">[value <span style="color: #6C2F00">&ltpoints&gt</span>]</span></p>
+          <p style="text-indent: 5.5em"><span style="color: #521377">[on <span style="color: #2F0448">&ltYYYY-MM-DD&gt</span>]</span></p>
+          <p style="text-indent: 5.5em"><span style="color: #B1B014">[btw <span style="color: #6C6B00">&ltmessage&gt</span>]</span></p></h1>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyB2ZOF5JZW3clFnFyqJbZV7kf_AjsGVsWQ",
+        authDomain: "midi-chlorian-meter.firebaseapp.com",
+        databaseURL: "https://midi-chlorian-meter.firebaseio.com",
+        projectId: "midi-chlorian-meter",
+        storageBucket: "midi-chlorian-meter.appspot.com",
+        messagingSenderId: "434811748069"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script>
+
+    </script>
+  </body>
+</html>
