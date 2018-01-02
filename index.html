@@ -55,6 +55,13 @@
         <ul class="dropdown-menu" id="dropdown-menu">
         </ul>
     </div>
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+        <span id="selectedYear" class="selectedYear">Year </span>
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" id="year-dropdown-menu">
+        </ul>
+    </div>
     <h2><table class="table table-striped sortable"><thead><tr>
      <th>Name</th>
      <th class="sorttable_numeric">Points</th>
@@ -84,7 +91,9 @@
         var allEvents = []
         var monthNames = ["January", "February", "March", "April", "May", "June",
                           "July", "August", "September", "October", "November", "December"];
+        var years = ["2017", "2018", "2019", "2020", "2021"]
         var selectedMonth = new Date();
+        var selectedYear = new Date();
 
         firebase.auth().onAuthStateChanged(user => { });
 
@@ -101,13 +110,11 @@
             }
           }
 
-          if (userFound === undefined) {
+          if (userFound === undefined && userVal.rank != "Legacy") {
             console.log(userVal)
             userFound = {"name": data.key, "totalPoints": 0, "jedi": userVal.jedi, "padawanPoints": 0}
             users.push(userFound)
           }
-
-          userFound.jedi = userVal.jedi
         });
 
         var eventsRef = firebase.database().ref('/events');
@@ -118,8 +125,8 @@
 
           allEvents.push(eventVal)
 
-          var firstDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1));
-          var lastDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0));
+          var firstDay = new Date(Date.UTC(selectedYear.getFullYear(), selectedMonth.getMonth(), 1));
+          var lastDay = new Date(Date.UTC(selectedYear.getFullYear(), selectedMonth.getMonth() + 1, 0));
 
           var eventDate = new Date(eventVal.date)
 
@@ -170,17 +177,65 @@
         }
 
         document.getElementById("selectedMonth").innerHTML = monthNames[selectedMonth.getMonth()];
+        document.getElementById("selectedYear").innerHTML = selectedYear.getFullYear();
 
         renderMonthDropDown();
+        renderYearDropDown();
 
         $(".dropdown-menu li").click(function(){
           var selText = $(this).text();
           $(this).parents('.dropdown').find('.selectedMonth').html(selText+' ');
-          var index = monthNames.indexOf(selText)
-          selectedMonth = new Date(selectedMonth.getFullYear(), index, 1);
 
-          var firstDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1));
-          var lastDay = new Date(Date.UTC(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0));
+          var index = monthNames.indexOf(selText)
+          selectedMonth = new Date(selectedYear.getFullYear(), index, 1);
+
+          var firstDay = new Date(Date.UTC(selectedYear.getFullYear(), selectedMonth.getMonth(), 1));
+          var lastDay = new Date(Date.UTC(selectedYear.getFullYear(), selectedMonth.getMonth() + 1, 0));
+
+          for (var userIndex = 0; userIndex < users.length; userIndex++) {
+            var user = users[userIndex]
+            user.totalPoints = 0
+            user.padawanPoints = 0
+          }
+
+          for (var eventIndex = 0; eventIndex < allEvents.length; eventIndex++) {
+            var eventVal = allEvents[eventIndex]
+            var eventDate = new Date(eventVal.date)
+          if (eventDate.getTime() >= firstDay.getTime() && eventDate.getTime() <= lastDay.getTime()) {
+
+            for (var i = 0; i < users.length; i++) {
+              if (users[i].name == eventVal.user) {
+                userFound = users[i]
+              }
+            }
+
+            if (userFound === undefined) {
+              console.log("user not found for event: "+eventVal)
+              userFound = {"name": eventVal.user, "totalPoints": 0, "padawanPoints": 0}
+              users.push(userFound)
+            }
+
+            if (eventVal.padawan) {
+              userFound.padawanPoints = userFound.padawanPoints + eventVal.value
+            } else {
+              userFound.totalPoints = userFound.totalPoints + eventVal.value
+            }
+          }
+        }
+
+          sortUsers()
+
+          renderTable(users)
+
+        });
+
+        $("#year-dropdown-menu li").click(function(){
+          var selText = $(this).text();
+          $(this).parents('.dropdown').find('.selectedYear').html(selText+' ');
+          selectedYear = new Date(selText, 1, 1);
+
+          var firstDay = new Date(Date.UTC(selectedYear.getFullYear(), selectedMonth.getMonth(), 1));
+          var lastDay = new Date(Date.UTC(selectedYear.getFullYear(), selectedMonth.getMonth() + 1, 0));
 
           for (var userIndex = 0; userIndex < users.length; userIndex++) {
             var user = users[userIndex]
@@ -224,6 +279,15 @@
           for (var i = 0; i < monthNames.length; i++) {
             var li = document.createElement('li');
             li.innerHTML = monthNames[i]
+            dropdown.appendChild(li)
+          }
+        }
+
+        function renderYearDropDown() {
+          var dropdown = document.getElementById('year-dropdown-menu');
+          for (var i = 0; i < years.length; i++) {
+            var li = document.createElement('li');
+            li.innerHTML = years[i]
             dropdown.appendChild(li)
           }
         }
